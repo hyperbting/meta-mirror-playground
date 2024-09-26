@@ -2,6 +2,17 @@
 public partial class ControllerScript
 {
 
+    private bool TryBecomeOwner_Meta()
+    {
+        if (OVRInput.Get(OVRInput.RawButton.RIndexTrigger))
+            return true;
+
+        return false;
+    }
+
+    private bool TryReleaseOwner_Meta() => !TryBecomeOwner_Meta();
+    
+    
     // Update is called once per frame
     void Update_Meta()
     {
