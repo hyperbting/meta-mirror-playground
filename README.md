@@ -13,7 +13,7 @@ isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{red}False}$$
 isServer: $${\color{red}False}$$, isOwned: $${\color{red}False}$$
 
 ##### NetworkedPlayer Start (ONLY timing seems show correct state
-isLocalPlayer: $${\color{green}True}$$, isClient: $${\color{green}True}$$
+isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{green}True}$$
 isServer: $${\color{green}True}$$, isOwned: $${\color{green}True}$$
 
 ##### NetworkedPlayer OnDisable 
