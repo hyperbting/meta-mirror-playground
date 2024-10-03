@@ -2,9 +2,14 @@
 
 ```mermaid
 flowchart TD
+    subgraph  Client Input
+    A[XRInput]
+    C[KeyboardInput] 
+    end
     subgraph  Clients
-    A[XRInput] --> B[NewInputSystem]
-    C[KeyboardInput] --> B[NewInputSystem]
+    B[NewInputSystem]
+    A --> B
+    C --> B
     B --> D[MOVE]
     D --> E[CmdMove]
     P[localNetworkedPlayer]
