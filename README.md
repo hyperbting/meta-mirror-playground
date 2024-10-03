@@ -2,10 +2,16 @@
 
 ```mermaid
 flowchart TD
+    subgraph  Clients
     A[XRInput] --> B[NewInputSystem]
     C[KeyboardInput] --> B[NewInputSystem]
     B --> D[MOVE]
     D --> E[CmdMove]
+    P[localNetworkedPlayer]
+    end
+    subgraph  Server
+    E --update parts Pos, Rot--> F[NetworkdPlayer] -- sync with Mirror's NetworkTransform --> P
+    end
 ```
 
 # Execution Order in Mirror Networked
