@@ -1,4 +1,12 @@
+# XRInput send MOVE throught CmdMove()
 
+```mermaid
+flowchart TD
+    A[XRInput] --> B[NewInputSystem]
+    C[KeyboardInput] --> B[NewInputSystem]
+    B --> D[MOVE]
+    D --> E[CmdMove]
+```
 
 # Execution Order in Mirror Networked
 
