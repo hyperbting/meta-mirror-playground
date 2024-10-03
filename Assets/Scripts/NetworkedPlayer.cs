@@ -1,42 +1,62 @@
+using System;
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 public partial class NetworkedPlayer : NetworkBehaviour
 {
     public GameObject localPlayerInputGameObject;
+
+    [SerializeField]private bool _isLocalPlayer = false;
     
-    #region
-    // [SyncVar(hook = nameof(OnChangeLeftHandTransform))]
-    // public Transform leftHand;
-    // [SyncVar(hook = nameof(OnChangeRightHandTransform))]
-    // public Transform rightHand;
-    // void OnChangeLeftHandTransform(Transform oldHandTransform, Transform newHandTransform)
-    // {
-    // //     leftHandGameObject.transform.position = newHandTransform.position;
-    // //     leftHandGameObject.transform.rotation = newHandTransform.rotation;
-    // //     leftHandGameObject.transform.localScale = newHandTransform.localScale;
-    // }
-    //
-    // void OnChangeRightHandTransform(Transform oldHandTransform, Transform newHandTransform)
-    // {
-    //     // rightHandGameObject.transform.position = newHandTransform.position;
-    //     // rightHandGameObject.transform.rotation = newHandTransform.rotation;
-    //     // rightHandGameObject.transform.localScale = newHandTransform.localScale;
-    // }
+    #region Sync Transform
+    [SerializeField] private Transform headTransform;
+    [SerializeField] private Transform leftHandTransform;
+    [SerializeField] private Transform rightHandTransform;
     #endregion
     
-    #region conditional sync
-    [SyncVar] public Vector3 leftHandPos;
-    [SyncVar] public Quaternion leftHandRot;
-    [SyncVar] public Vector3 rightHandPos;
-    [SyncVar] public Quaternion rightHandRot;
-    #endregion
+    // #region conditional sync
+    // #endregion
     
+    private void Awake()
+    {
+        // NO MIRROR info here
+        Debug.LogWarning($"NetworkedPlayer{netId} Awake \nisLocalPlayer:{isLocalPlayer}, isClient:{isClient}\nisServer:{isServer}, isOwned:{isOwned}");
+    }
+
+    private void OnEnable()
+    {
+        // NO MIRROR info here
+        Debug.LogWarning($"NetworkedPlayer{netId} OnEnable \nisLocalPlayer:{isLocalPlayer}, isClient:{isClient}\nisServer:{isServer}, isOwned:{isOwned}");
+    }
+
+    private void OnDisable()
+    {
+        Debug.LogWarning($"NetworkedPlayer{netId} OnDisable \nisLocalPlayer:{isLocalPlayer}, isClient:{isClient}\nisServer:{isServer}, isOwned:{isOwned}");
+        
+        if(_isLocalPlayer)
+            ConfigManager.Instance.UnregisterMyPlayer(this);
+    }
+
+    private void OnDestroy()
+    {
+        Debug.LogWarning($"NetworkedPlayer{netId} OnDestroy \nisLocalPlayer:{isLocalPlayer}, isClient:{isClient}\nisServer:{isServer}, isOwned:{isOwned}");
+    }
+
     void Start()
     {
+        Debug.LogWarning($"NetworkedPlayer{netId} Start \nisLocalPlayer:{isLocalPlayer}, isClient:{isClient}\nisServer:{isServer}, isOwned:{isOwned}");
+        if (isOwned)
+        {
+            _isLocalPlayer = true;
+            ConfigManager.Instance.RegisterMyPlayer(this);
+            
+            HideLocalIndicator();
+        }
+
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
         Start_Standalone();
 #endif
@@ -44,22 +64,18 @@ public partial class NetworkedPlayer : NetworkBehaviour
     
     void Update()
     {
-        if (!isLocalPlayer) return;
+        if (!isOwned) return;
         
         //TODO: and other optional skipping strategy
         
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
         Update_Standalone();
-        //CmdUpdateHandsTransform(eLeft, eRight);
 #endif
-        
-        // //Get left/ right hand Transform from ?
-        // CmdUpdateHandsTransform();
     }
 
     void FixedUpdate()
     {
-        if (!isLocalPlayer) return;
+        if (!isOwned) return;
         
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
         FixedUpdate_Standalone();
@@ -67,18 +83,35 @@ public partial class NetworkedPlayer : NetworkBehaviour
     }
     
     [Command]
-    void CmdUpdateHandsTransform(Transform left, Transform right)
+    public void CmdPlayerBodyPartSync(
+        Vector3 newHeadPos, Quaternion newHeadRot, 
+        Vector3 newLeftPos, Quaternion newLeftRot, 
+        Vector3 newRightPos,Quaternion newRightRot
+        )
     {
-        if (left)
+        if (headTransform)
         {
-            leftHandPos = left.localPosition;
-            leftHandRot = left.localRotation;
+            headTransform.position = newHeadPos;
+            headTransform.rotation = newHeadRot;
         }
 
-        if (right)
+        if (leftHandTransform)
         {
-            rightHandPos = right.localPosition;
-            rightHandRot = right.localRotation;
+            leftHandTransform.position = newLeftPos;
+            leftHandTransform.rotation = newLeftRot;
         }
+        
+        if (rightHandTransform)
+        {
+            rightHandTransform.position = newRightPos;
+            rightHandTransform.rotation = newRightRot;
+        }
+    }
+
+    private void HideLocalIndicator()
+    {
+        var tr = headTransform.gameObject.GetComponentInChildren<GameObject>();
+        if(tr)
+            tr.SetActive(false);
     }
 }

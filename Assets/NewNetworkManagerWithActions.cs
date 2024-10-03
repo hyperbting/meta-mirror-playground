@@ -10,6 +10,20 @@ using Mirror;
 
 public class NewNetworkManagerWithActions : NetworkManager
 {
+    #region MyRegion
+#if UNITY_EDITOR
+    [ContextMenu("Manual NetworkAuthority NetworkClient.AddPlayer")]
+    private void DebugManualInstantiatePlayer() => NetworkClient.AddPlayer();
+
+    // [ContextMenu("Manual ClientAuthority NetworkClient.AddPlayer")]
+    // private void DebugManualInstantiatePlayer2()
+    // {
+    //     var go = Instantiate(playerPrefab);
+    //     NetworkServer.Spawn(go, connectionToClient);
+    // }
+#endif    
+    #endregion
+    
     // You can adjust the parameters of the Actions below to suit your needs and pass the values through the Invoke() method.
 
     public event Action OnStartAction;

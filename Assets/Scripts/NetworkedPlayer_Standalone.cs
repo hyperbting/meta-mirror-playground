@@ -6,13 +6,13 @@ using UnityEngine.InputSystem;// 1. The Input System "using" statement
 
 public partial class NetworkedPlayer
 {
-    // private Transform eLeft;
-    // private Transform eRight;
-    
     // 2. These variables are to hold the Action references
     InputAction moveAction;
 
-    [SerializeField] private Transform myVrRig;
+    // [SerializeField] private Transform myVrRig;
+    // public void AssignVrRig(Transform vrRigTransform) => myVrRig=vrRigTransform;
+    
+    
     private void Start_Standalone()
     {
         // 3. Find the references to the "Move" and "Jump" actions
@@ -28,35 +28,17 @@ public partial class NetworkedPlayer
         
         // your movement code here
         transform.position += transform.forward*moveValue.x + transform.right*moveValue.y;
-        
-        // if (!eLeft)
-        // {
-        //     var emptyGO = new GameObject();
-        //     eLeft = emptyGO.transform;
-        // }
-        //
-        // if (!eRight)
-        // {
-        //     var emptyGO = new GameObject();
-        //     eRight = emptyGO.transform;
-        // }
-        //
-        // var preLeftPos = eLeft.position;
-        // preLeftPos.y = (Mathf.FloorToInt(Time.time) % 3) / 10f;
-        // eLeft.position = preLeftPos;
-        //
-        // var preRightPos = eRight.position;
-        // preRightPos.x = (Mathf.FloorToInt(Time.time) % 3) / 10f;
-        // eRight.position = preRightPos;
     }
 
     private void FixedUpdate_Standalone()
     {
-        if (!myVrRig)
-            return;
-        
-        myVrRig.position = transform.position;
-        myVrRig.rotation = transform.rotation;
-        myVrRig.localScale = transform.localScale;
+        // if (!myVrRig)
+        //     return;
+        //
+        // myVrRig.position = transform.position;
+        // myVrRig.rotation = transform.rotation;
+        // myVrRig.localScale = transform.localScale;
     }
+    
+
 }
