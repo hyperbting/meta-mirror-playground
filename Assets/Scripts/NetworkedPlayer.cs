@@ -8,21 +8,30 @@ using UnityEngine.Serialization;
 
 public partial class NetworkedPlayer : NetworkBehaviour
 {
-    public GameObject localPlayerInputGameObject;
-
     [SerializeField]private bool _isLocalPlayer = false;
     
+    #region Player Movement Sync
+    public enum PlayerMovementType
+    {
+        Transform,
+        DirectionOnly
+    }
+    public static readonly PlayerMovementType TypePlayerMovement = PlayerMovementType.Transform;
+    #endregion
+        
     #region Sync Transform
     [SerializeField] private Transform headTransform;
     [SerializeField] private Transform leftHandTransform;
     [SerializeField] private Transform rightHandTransform;
+    
+    [SerializeField] private GameObject headMesh;
     #endregion
     
     // #region conditional sync
     // #endregion
     
     private void Awake()
-    {
+    {        
         // NO MIRROR info here
         Debug.LogWarning($"NetworkedPlayer{netId} Awake \nisLocalPlayer:{isLocalPlayer}, isClient:{isClient}\nisServer:{isServer}, isOwned:{isOwned}");
     }
@@ -54,7 +63,7 @@ public partial class NetworkedPlayer : NetworkBehaviour
             _isLocalPlayer = true;
             ConfigManager.Instance.RegisterMyPlayer(this);
             
-            HideLocalIndicator();
+            //HideLocalIndicator();
         }
 
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
@@ -82,11 +91,21 @@ public partial class NetworkedPlayer : NetworkBehaviour
 #endif
     }
     
+    //public void CmdPlayerMoveDirectionSync() => CmdPlayerMoveDirectionSync(moveValue, rotateValue.y);
+    
+    [Command]
+    public void CmdPlayerMoveDirectionSync(Vector2 moveDir, float rotDir)
+    {
+        // using Vector2 moveDirectionUpdated and Quaternion rotationUpdated
+        MoveByDirection(moveDir);
+        RotateByDirection(rotDir);
+    }
+    
     [Command]
     public void CmdPlayerBodyPartSync(
         Vector3 newHeadPos, Quaternion newHeadRot, 
-        Vector3 newLeftPos, Quaternion newLeftRot, 
-        Vector3 newRightPos,Quaternion newRightRot
+        Vector3 newLeftLPos, Quaternion newLeftLRot, 
+        Vector3 newRightLPos,Quaternion newRightLRot
         )
     {
         if (headTransform)
@@ -97,21 +116,19 @@ public partial class NetworkedPlayer : NetworkBehaviour
 
         if (leftHandTransform)
         {
-            leftHandTransform.position = newLeftPos;
-            leftHandTransform.rotation = newLeftRot;
+            leftHandTransform.localPosition = newLeftLPos;
+            leftHandTransform.localRotation = newLeftLRot;
         }
         
         if (rightHandTransform)
         {
-            rightHandTransform.position = newRightPos;
-            rightHandTransform.rotation = newRightRot;
+            rightHandTransform.localPosition = newRightLPos;
+            rightHandTransform.localRotation = newRightLRot;
         }
     }
 
     private void HideLocalIndicator()
     {
-        var tr = headTransform.gameObject.GetComponentInChildren<GameObject>();
-        if(tr)
-            tr.SetActive(false);
+        headMesh?.SetActive(false);
     }
 }

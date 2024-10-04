@@ -8,37 +8,61 @@ public partial class NetworkedPlayer
 {
     // 2. These variables are to hold the Action references
     InputAction moveAction;
-
-    // [SerializeField] private Transform myVrRig;
-    // public void AssignVrRig(Transform vrRigTransform) => myVrRig=vrRigTransform;
+    InputAction lookAction;
     
+    [Header("Only used in DirectionSync")]
+    [SerializeField] private Vector2 moveValue;
+    [SerializeField] private Vector2 rotateValue;
+    //[SerializeField] private Vector3 scaleValue;
     
     private void Start_Standalone()
     {
         // 3. Find the references to the "Move" and "Jump" actions
         moveAction = InputSystem.actions.FindAction("Move");
+        lookAction = InputSystem.actions.FindAction("Look");
     }
+    
     private void Update_Standalone()
     {
         // 4. Read the "Move" action value, which is a 2D vector
-        var moveValue = moveAction.ReadValue<Vector2>();
+        moveValue = moveAction.ReadValue<Vector2>();
         moveValue.Normalize();
-        moveValue *= 0.01f;
-        //Debug.Log(moveValue);
         
-        // your movement code here
-        transform.position += transform.forward*moveValue.x + transform.right*moveValue.y;
+        rotateValue = lookAction.ReadValue<Vector2>();
+        
+        switch(TypePlayerMovement)
+        {
+            case PlayerMovementType.Transform:
+                // move locally and directly
+                MoveByDirection(moveValue);
+                RotateByDirection(rotateValue.y);
+                break;
+            case PlayerMovementType.DirectionOnly:
+                CmdPlayerMoveDirectionSync(moveValue, rotateValue.y);
+                break;
+            default:
+                break;
+        }
     }
 
     private void FixedUpdate_Standalone()
     {
-        // if (!myVrRig)
-        //     return;
-        //
-        // myVrRig.position = transform.position;
-        // myVrRig.rotation = transform.rotation;
-        // myVrRig.localScale = transform.localScale;
-    }
-    
+    } 
 
+    #region
+    private void MoveByDirection(Vector2 dir)
+    {
+        dir *= 0.01f;
+        //Debug.Log(moveValue);
+        
+        // your movement code here
+        transform.position += transform.forward * dir.x + transform.right * dir.y;
+    }
+
+    private void RotateByDirection(float dir)
+    {
+        dir *= 0.01f;
+        transform.Rotate(Vector3.up, dir);
+    }
+    #endregion
 }

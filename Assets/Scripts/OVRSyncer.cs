@@ -58,18 +58,15 @@ public class OVRSyncer : MonoBehaviour
         if (!myPla && (!ConfigManager.Instance || !ConfigManager.Instance.TryGetMyLocalPlayer(ref myPla)))
             return;
         
-        // sync from NetworkedPlayer to vrRig
+        // reposition from NetworkedPlayer to vrRig 
         transform.position = myPla.transform.position;
         transform.rotation = myPla.transform.rotation;
-            
-        // sync from VrRig to NetworkedPlayer
+        
+        // sync from VrRig Parts to NetworkedPlayer
         myPla.CmdPlayerBodyPartSync(
-            sceneCamera.transform.position,
-            sceneCamera.transform.rotation,
-            OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTouch),
-            OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTouch),
-            OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch),
-            OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch)
-            );
+            sceneCamera.transform.position, sceneCamera.transform.rotation,
+            OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTouch), OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTouch),
+            OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch), OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch)
+        );
     }
 }
