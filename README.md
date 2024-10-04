@@ -1,4 +1,9 @@
-# XRInput send MOVE throught CmdMove()
+## General Architecture
+* Unity 2022.3
+* Meta XR Core - Oculus XR Plugin (NOT OpenXR, since it does not support Linux)
+* Mirror - Linux server in Docker 
+
+## XRInput send MOVE throught CmdMove()
 
 ```mermaid
 flowchart TD
@@ -38,62 +43,69 @@ flowchart TD
     end
 ```
 
-# Execution Order in Mirror Networked
+## Execution Order in Mirror Networked
 
-__No netId__ at ``Awake`` and ``OnEnable``
+### Player instance ownership
 
-##### NetworkedPlayer Awake, OnEnable 
-isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{red}False}$$
-isServer: $${\color{red}False}$$, isOwned: $${\color{red}False}$$
+Creating a player BY SERVER, OWNED by SERVER, isLocalPlayer always $${\color{red}FALSE}$$
+
+ [NetworkClient.AddPlayer()](https://storage.googleapis.com/mirror-api-docs/html/df/d6f/class_mirror_1_1_network_client.html#abb593c6a35fa52633a8f0795b9aa74b7) 
+```
+Sends AddPlayer message to the server, indicating that we want to join the world.
+```
 
 
+__No netId__ at ``Awake`` and ``OnEnable``, hence NO events in these two states
 
-## HOST(Server+Client) 
+| Event                      | isLocalPlayer | isClient | isServer | isOwned |
+|-----------------------------|---------------|----------|----------|---------|
+| **NetworkedPlayer Awake**    | False | False | False | False |
+| **NetworkedPlayer OnEnable** | False | False | False | False |
+
+
+### HOST(Server+Client) 
 __No netId__ at ``Awake``, ``OnEnable``,``OnDisable``,``OnDestroy``
 
-### Local player, created by NetworkClient.AddPlayer()
+* NetworkedPlayer Start (ONLY timing seems show correct state
+* NetworkedPlayer OnDisable,  OnDestroy, NO netId at this moment
 
-##### NetworkedPlayer Start (ONLY timing seems show correct state
-isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{green}True}$$
-isServer: $${\color{green}True}$$, isOwned: $${\color{green}True}$$
+#### Local player, created by NetworkClient.AddPlayer()
 
-##### NetworkedPlayer OnDisable,  OnDestroy, NO netId at this moment
-isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{red}False}$$
-isServer: $${\color{red}False}$$, isOwned: $${\color{red}False}$$
+| Event                      | isLocalPlayer | isClient | isServer | isOwned |
+|-----------------------------|---------------|----------|----------|---------|
+| **NetworkedPlayer Start**    | False         | $${\color{green}True}$$     | $${\color{green}True}$$     | $${\color{green}True}$$    |
+| **NetworkedPlayer OnDisable** | False         | $${\color{red}False}$$    | $${\color{red}False}$$    | $${\color{red}False}$$   |
+| **NetworkedPlayer OnDestroy** | False         | $${\color{red}False}$$    | $${\color{red}False}$$    | $${\color{red}False}$$   |
 
-### Others player, created by NetworkClient.AddPlayer()
+#### Others' players, created by NetworkClient.AddPlayer()
 
-##### NetworkedPlayer Start (ONLY timing seems show correct state
-isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{green}True}$$
-isServer: $${\color{green}True}$$, isOwned: $${\color{red}False}$$
+| Event                      | isLocalPlayer | isClient | isServer | isOwned |
+|-----------------------------|---------------|----------|----------|---------|
+| **NetworkedPlayer Start**    | False         | $${\color{green}True}$$     | $${\color{green}True}$$     | False    |
+| **NetworkedPlayer OnDisable** | False         | $${\color{red}False}$$    | $${\color{red}False}$$    | False   |
+| **NetworkedPlayer OnDestroy** | False         | $${\color{red}False}$$    | $${\color{red}False}$$    | False  |
 
-##### NetworkedPlayer OnDisable,  OnDestroy, NO netId at this moment
-isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{red}False}$$
-isServer: $${\color{red}False}$$, isOwned: $${\color{red}False}$$
-
-
-
-## CLIENT 
+### CLIENT 
 __No netId__ at ``Awake``, ``OnEnable``
 
 __HAS netId__ at ``OnDisable``,``OnDestroy``
 
-### Local player, created by NetworkClient.AddPlayer()
+* NetworkedPlayer Start
+* NetworkedPlayer OnDisable, OnDestroy: HAS netId
+  
+#### Local player, created by NetworkClient.AddPlayer()
 
-##### NetworkedPlayer Start
-isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{green}True}$$
-isServer: $${\color{red}False}$$, isOwned: $${\color{green}True}$$
+| Event                      | isLocalPlayer | isClient | isServer | isOwned |
+|-----------------------------|---------------|----------|----------|---------|
+| **NetworkedPlayer Start**    | False         | $${\color{green}True}$$     | False     | $${\color{green}True}$$    |
+| **NetworkedPlayer OnDisable** | False         | $${\color{green}True}$$     | False     | $${\color{green}True}$$    |
+| **NetworkedPlayer OnDestroy** | False         | $${\color{green}True}$$     | False     | $${\color{green}True}$$    |
 
-##### NetworkedPlayer OnDisable, OnDestroy: HAS netId
-isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{green}True}$$
-isServer: $${\color{red}False}$$, isOwned: $${\color{green}True}$$
+### Others' players, created by NetworkClient.AddPlayer()
 
-### Other players, created by NetworkClient.AddPlayer()
+| Event                      | isLocalPlayer | isClient | isServer | isOwned |
+|-----------------------------|---------------|----------|----------|---------|
+| **NetworkedPlayer Start**    | False         | $${\color{green}True}$$     | False     | False    |
+| **NetworkedPlayer OnDisable** | False         | $${\color{green}True}$$     | False     | False    |
+| **NetworkedPlayer OnDestroy** | False         | $${\color{green}True}$$     | False     | False    |
 
-##### NetworkedPlayer Start (ONLY timing seems show correct state
-isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{green}True}$$
-isServer: $${\color{red}False}$$, isOwned: $${\color{red}False}$$
-
-##### NetworkedPlayer OnDisable, OnDestroy : HAS netId
-isLocalPlayer: $${\color{red}False}$$, isClient: $${\color{green}True}$$
-isServer: $${\color{red}False}$$, isOwned: $${\color{red}False}$$
