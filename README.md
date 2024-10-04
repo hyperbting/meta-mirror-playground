@@ -73,17 +73,17 @@ __No netId__ at ``Awake``, ``OnEnable``,``OnDisable``,``OnDestroy``
 
 | Event                      | isLocalPlayer | isClient | isServer | isOwned |
 |-----------------------------|---------------|----------|----------|---------|
-| **NetworkedPlayer Start**    | False         | $${\color{green}True}$$     | $${\color{green}True}$$     | $${\color{green}True}$$    |
-| **NetworkedPlayer OnDisable** | False         | $${\color{red}False}$$    | $${\color{red}False}$$    | $${\color{red}False}$$   |
-| **NetworkedPlayer OnDestroy** | False         | $${\color{red}False}$$    | $${\color{red}False}$$    | $${\color{red}False}$$   |
+| **NetworkedPlayer Start**    | $${\color{green}True}$$ | $${\color{green}True}$$ | $${\color{green}True}$$ | $${\color{green}True}$$ |
+| **NetworkedPlayer OnDisable** | $${\color{red}False}$$ | $${\color{red}False}$$ | $${\color{red}False}$$ | $${\color{red}False}$$  |
+| **NetworkedPlayer OnDestroy** | $${\color{red}False}$$ | $${\color{red}False}$$ | $${\color{red}False}$$ | $${\color{red}False}$$  |
 
 #### Others' players, created by NetworkClient.AddPlayer()
 
 | Event                      | isLocalPlayer | isClient | isServer | isOwned |
 |-----------------------------|---------------|----------|----------|---------|
-| **NetworkedPlayer Start**    | False         | $${\color{green}True}$$     | $${\color{green}True}$$     | False    |
-| **NetworkedPlayer OnDisable** | False         | $${\color{red}False}$$    | $${\color{red}False}$$    | False   |
-| **NetworkedPlayer OnDestroy** | False         | $${\color{red}False}$$    | $${\color{red}False}$$    | False  |
+| **NetworkedPlayer Start**    | False         | False     | $${\color{green}True}$$ | False    |
+| **NetworkedPlayer OnDisable** | False | False | False | False |
+| **NetworkedPlayer OnDestroy** | False | False | False | False |
 
 ### CLIENT 
 __No netId__ at ``Awake``, ``OnEnable``
@@ -97,9 +97,9 @@ __HAS netId__ at ``OnDisable``,``OnDestroy``
 
 | Event                      | isLocalPlayer | isClient | isServer | isOwned |
 |-----------------------------|---------------|----------|----------|---------|
-| **NetworkedPlayer Start**    | False         | $${\color{green}True}$$     | False     | $${\color{green}True}$$    |
-| **NetworkedPlayer OnDisable** | False         | $${\color{green}True}$$     | False     | $${\color{green}True}$$    |
-| **NetworkedPlayer OnDestroy** | False         | $${\color{green}True}$$     | False     | $${\color{green}True}$$    |
+| **NetworkedPlayer Start**    | $${\color{green}True}$$ | $${\color{green}True}$$     | False     | $${\color{green}True}$$   |
+| **NetworkedPlayer OnDisable** | $${\color{green}True}$$ | $${\color{green}True}$$     | False     | $${\color{green}True}$$   |
+| **NetworkedPlayer OnDestroy** | $${\color{green}True}$$ | $${\color{green}True}$$     | False     | $${\color{green}True}$$   |
 
 ### Others' players, created by NetworkClient.AddPlayer()
 
