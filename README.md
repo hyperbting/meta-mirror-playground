@@ -4,18 +4,37 @@
 flowchart TD
     subgraph  Client Input
     A[XRInput]
-    C[KeyboardInput] 
-    end
-    subgraph  Clients
+    C[KeyboardInput]
     B[NewInputSystem]
     A --> B
     C --> B
+    end
+    subgraph  Clients
+    B --> E[CmdMoveDirection]
+    P[localNetworkedPlayer]
+    end
+    subgraph  Server    
+    E --tell player instance in Server to move in direction--> D[MOVE]
+    D --update parts Pos, Rot--> F[NetworkdPlayer] -- sync with Mirror's NetworkTransform --> P
+    end
+```
+
+```mermaid
+flowchart TD
+    subgraph  Client Input
+    A[XRInput]
+    C[KeyboardInput]
+    B[NewInputSystem]
+    A --> B
+    C --> B
+    end
+    subgraph  Clients
     B --> D[MOVE]
-    D --> E[CmdMove]
+    D --update parts Pos, Rot--> E[CmdMove]
     P[localNetworkedPlayer]
     end
     subgraph  Server
-    E --update parts Pos, Rot--> F[NetworkdPlayer] -- sync with Mirror's NetworkTransform --> P
+    E --tell player instance in Server pot/rot/scale--> F[NetworkdPlayer] -- sync with Mirror's NetworkTransform --> P
     end
 ```
 
