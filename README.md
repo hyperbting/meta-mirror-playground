@@ -45,6 +45,26 @@ flowchart TD
 
 ## Execution Order in Mirror Networked
 
+```mermaid
+classDiagram
+    MonoBehaviour <|-- NetworkBehaviour
+    NetworkBehaviour <|-- NetworkManager
+```
+
+| Event                      | NetworkBehaviour  | NetworkManager  | 
+|-----------------------------|---------------|----------|
+| OnStartServer | Server | Server |
+| OnStartHost | n/a | Host |
+| OnServerConnect n/a | | |
+| OnStartAuthority | Client | n/a |
+| OnStartClient | Client | |
+| OnClientConnect | n/a | |
+| OnServerSceneChanged | n/a | Server |
+| OnServerReady | n/a | |
+| OnServerAddPlayer | n/a | |
+| OnClientChangeScene | n/a | |
+| OnClientSceneChanged | n/a | |
+
 ### Player instance ownership
 
 Creating a player BY SERVER, OWNED by SERVER, isLocalPlayer always $${\color{red}FALSE}$$
