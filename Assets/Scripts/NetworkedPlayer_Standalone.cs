@@ -28,6 +28,7 @@ public partial class NetworkedPlayer
         moveValue = moveAction.ReadValue<Vector2>();
         moveValue.Normalize();
         
+        // 4-2. Read the "Look" action value, which is a 2D vector
         rotateValue = lookAction.ReadValue<Vector2>();
         
         switch(TypePlayerMovement)
@@ -43,6 +44,16 @@ public partial class NetworkedPlayer
             default:
                 break;
         }
+
+        //move certain body parts to VRrRig's values
+        var ovs = ConfigManager.Instance.ovrSyncer;
+        if (!ovs)
+            return;
+        
+        MoveHead(ovs.headPosition, ovs.headRotation);
+        //MoveTorso(ovs.torsoPosition, ovs.torsoRotation);
+        MoveLeftHand(ovs.leftHandLocPosition, ovs.leftHandLocRotation);
+        MoveRightHand(ovs.rightHandLocPosition, ovs.rightHandLocRotation);
     }
 
     private void FixedUpdate_Standalone()
@@ -63,6 +74,34 @@ public partial class NetworkedPlayer
     {
         dir *= 0.01f;
         transform.Rotate(Vector3.up, dir);
+    }
+
+    private void MoveHead(Vector3 newHeadPos, Quaternion newHeadRot)
+    {
+        if (!headTransform) return;
+        headTransform.position = newHeadPos;
+        headTransform.rotation = newHeadRot;
+    }
+
+    private void MoveTorso(Vector3 newPos, Quaternion newRot)
+    {
+        if (!torsoTransform) return;
+        torsoTransform.position = newPos;
+        torsoTransform.rotation = newRot;
+    }
+    
+    private void MoveLeftHand(Vector3 newPos, Quaternion newRot)
+    {
+        if (!leftHandTransform) return;
+        leftHandTransform.position = newPos;
+        leftHandTransform.rotation = newRot;
+    }
+    
+    private void MoveRightHand(Vector3 newPos, Quaternion newRot)
+    {
+        if (!rightHandTransform) return;
+        rightHandTransform.position = newPos;
+        rightHandTransform.rotation = newRot;
     }
     #endregion
 }

@@ -10,6 +10,8 @@ public partial class NetworkedPlayer : NetworkBehaviour
 {
     [SerializeField]private bool _isLocalPlayer = false;
     
+    [SerializeField]private uint _netID;
+    
     #region Player Movement Sync
     public enum PlayerMovementType
     {
@@ -21,9 +23,10 @@ public partial class NetworkedPlayer : NetworkBehaviour
         
     #region Sync Transform
     [SerializeField] private Transform headTransform;
+    [SerializeField] private Transform torsoTransform;
     [SerializeField] private Transform leftHandTransform;
     [SerializeField] private Transform rightHandTransform;
-    
+    [Header("visual purpose")]
     [SerializeField] private GameObject headMesh;
     #endregion
     
@@ -45,7 +48,6 @@ public partial class NetworkedPlayer : NetworkBehaviour
     private void OnDisable()
     {
         Debug.LogWarning($"NetworkedPlayer{netId} OnDisable \nisLocalPlayer:{isLocalPlayer}, isClient:{isClient}\nisServer:{isServer}, isOwned:{isOwned}");
-        
         if(_isLocalPlayer)
             ConfigManager.Instance.UnregisterMyPlayer(this);
     }
@@ -58,6 +60,9 @@ public partial class NetworkedPlayer : NetworkBehaviour
     void Start()
     {
         Debug.LogWarning($"NetworkedPlayer{netId} Start \nisLocalPlayer:{isLocalPlayer}, isClient:{isClient}\nisServer:{isServer}, isOwned:{isOwned}");
+        
+        _netID = netId;
+        
         if (isOwned)
         {
             _isLocalPlayer = true;
@@ -101,31 +106,17 @@ public partial class NetworkedPlayer : NetworkBehaviour
         RotateByDirection(rotDir);
     }
     
-    [Command]
-    public void CmdPlayerBodyPartSync(
-        Vector3 newHeadPos, Quaternion newHeadRot, 
-        Vector3 newLeftLPos, Quaternion newLeftLRot, 
-        Vector3 newRightLPos,Quaternion newRightLRot
-        )
-    {
-        if (headTransform)
-        {
-            headTransform.position = newHeadPos;
-            headTransform.rotation = newHeadRot;
-        }
-
-        if (leftHandTransform)
-        {
-            leftHandTransform.localPosition = newLeftLPos;
-            leftHandTransform.localRotation = newLeftLRot;
-        }
-        
-        if (rightHandTransform)
-        {
-            rightHandTransform.localPosition = newRightLPos;
-            rightHandTransform.localRotation = newRightLRot;
-        }
-    }
+    // [Command]
+    // public void CmdPlayerBodyPartSync(
+    //     Vector3 newHeadPos, Quaternion newHeadRot, 
+    //     Vector3 newLeftLPos, Quaternion newLeftLRot, 
+    //     Vector3 newRightLPos,Quaternion newRightLRot
+    //     )
+    // {
+    //     MoveHead(newHeadPos, newHeadRot);
+    //     MoveLeftHand(newLeftLPos, newLeftLRot);
+    //     MoveRightHand( newRightLPos, newRightLRot);
+    // }
 
     private void HideLocalIndicator()
     {

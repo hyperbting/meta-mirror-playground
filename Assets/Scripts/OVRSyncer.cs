@@ -8,12 +8,20 @@ public class OVRSyncer : MonoBehaviour
     [ContextMenu("Debug Print VRPartPosRot")]
     private void DebugVRPartPosRot()
     {
-        Debug.LogWarning($"{sceneCamera.transform.position},{ sceneCamera.transform.rotation },\n" +
-                         $"{OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTouch)},{OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTouch)},\n" +
-                         $"{OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch)},{OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch)}"
+        Debug.LogWarning($"{headPosition},{ headRotation },\n" +
+                         $"{leftHandLocPosition},{leftHandLocRotation},\n" +
+                         $"{rightHandLocPosition},{rightHandLocRotation}"
                          );
     }
 
+    public Vector3 headPosition => sceneCamera.transform.position;
+    public Quaternion headRotation => sceneCamera.transform.rotation;
+    public Vector3 leftHandLocPosition => OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTouch);
+    public Quaternion leftHandLocRotation => OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTouch);
+    public Vector3 rightHandLocPosition => OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
+    public Quaternion rightHandLocRotation => OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch);
+    
+    
     private NetworkedPlayer myPla;
     [SerializeField] private Camera sceneCamera;
     
@@ -24,29 +32,7 @@ public class OVRSyncer : MonoBehaviour
         // https://developers.meta.com/horizon/documentation/unity/unity-ovrinput#how-do-i-set-up-controller-input-and-tracking
         OVRInput.Update();
         
-        //DebugVRPartPosRot();        
-
-        // // While thumbstick of right controller is currently pressed to the left
-        // if (OVRInput.Get(OVRInput.RawButton.RThumbstickLeft))
-        //     Debug.LogWarning("RThumbstickLeft");
-        //
-        // // While thumbstick of right controller is currently pressed to the right
-        // if (OVRInput.Get(OVRInput.RawButton.RThumbstickRight)) 
-        //     Debug.LogWarning("RThumbstickRight");
-        //
-        // // If user has just released Button A of right controller in this frame
-        // if (OVRInput.GetUp(OVRInput.Button.One))
-        // {
-        //     // Play short haptic on right controller
-        //     OVRInput.SetControllerVibration(1, 1, OVRInput.Controller.RTouch);
-        // }
-        //
-        // // While user holds the left hand trigger
-        // if (OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger) > 0.0f)
-        // {
-        //     // Assign left controller's position and rotation to cube
-        //     Debug.LogWarning($"{OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTouch)} {OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTouch)}");
-        // }
+        //DebugVRPartPosRot();
     }
 
     void FixedUpdate()
@@ -58,15 +44,16 @@ public class OVRSyncer : MonoBehaviour
         if (!myPla && (!ConfigManager.Instance || !ConfigManager.Instance.TryGetMyLocalPlayer(ref myPla)))
             return;
         
-        // reposition from NetworkedPlayer to vrRig 
-        transform.position = myPla.transform.position;
-        transform.rotation = myPla.transform.rotation;
-        
-        // sync from VrRig Parts to NetworkedPlayer
-        myPla.CmdPlayerBodyPartSync(
-            sceneCamera.transform.position, sceneCamera.transform.rotation,
-            OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTouch), OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTouch),
-            OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch), OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch)
-        );
+        // reposition vrRig, follows NetworkedPlayer
+        var tra = myPla.transform;
+        transform.position = tra.position;
+        transform.rotation = tra.rotation;
+
+        // // sync from VrRig Parts to NetworkedPlayer
+        // myPla.CmdPlayerBodyPartSync(
+        //     sceneCamera.transform.position, sceneCamera.transform.rotation,
+        //     OVRInput.GetLocalControllerPosition(OVRInput.Controller.LTouch), OVRInput.GetLocalControllerRotation(OVRInput.Controller.LTouch),
+        //     OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch), OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch)
+        // );
     }
 }

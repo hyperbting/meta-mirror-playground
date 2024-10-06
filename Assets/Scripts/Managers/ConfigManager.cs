@@ -10,6 +10,10 @@ public partial class ConfigManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        
+#if UNITY_SERVER || UNITY_STANDALONE
+        LoadEnv();
+#endif
     }
 
     // Start is called before the first frame update
@@ -23,4 +27,24 @@ public partial class ConfigManager : MonoBehaviour
     {
         
     }
+    
+#if UNITY_SERVER || UNITY_STANDALONE
+    #region
+    public enum EnvVariable
+    {
+    }
+
+    private IDictionary environmentVariables;
+    private void LoadEnv()
+    {
+        Debug.LogWarning("GetEnvironmentVariables: ");
+        environmentVariables = Environment.GetEnvironmentVariables();
+        
+        foreach (DictionaryEntry de in environmentVariables)
+        {
+            Debug.LogWarningFormat("{0}: {1}", de.Key, de.Value);
+        }
+    }
+    #endregion
+#endif
 }
